@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Data.SqlTypes;
 
 namespace WCFServiceWebRole1
 {
@@ -12,22 +14,30 @@ namespace WCFServiceWebRole1
     // NOTE: In order to launch WCF Test Client for testing this service, please select Service1.svc or Service1.svc.cs at the Solution Explorer and start debugging.
     public class Service1 : IService1
     {
-        public string GetData(int value)
+        private SqlConnection GetSqlConnection()
         {
-            return string.Format("You entered: {0}", value);
+            SqlConnection c = new SqlConnection();
+            c.ConnectionString =
+            "Data Source=(localdb)\\MSSQLLocalDB;Database=WebStore;Trusted_Connection=yes;";
+            return c;
         }
-
-        public CompositeType GetDataUsingDataContract(CompositeType composite)
+    
+        public bool CreateProduct(string key,string price)
         {
-            if (composite == null)
-            {
-                throw new ArgumentNullException("compositennnn");
-            }
-            if (composite.BoolValue)
-            {
-                composite.StringValue += "Suffix";
-            }
-            return composite;
+            string a = "12.3";
+            SqlMoney b = SqlMoney.Parse(a.Replace(',','.'));
+           // string a = "15,2";
+            //price1 = Convert.ToDouble(a.Replace('.', ','));
+            //Console.WriteLine(price1);
+            //string l = (price.GetType()).ToString();
+            //double a = Convert.ToDouble(price);
+            var c = GetSqlConnection();
+            c.Open();
+            var cmd = c.CreateCommand();
+            cmd.CommandText = $"INSERT into Product values('{key}', 'L', 'Blue',{b}, 'Dress')";
+            var result = cmd.ExecuteNonQuery();
+            c.Close();
+            return result > 0;
         }
     }
 }
