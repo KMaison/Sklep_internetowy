@@ -86,16 +86,16 @@ namespace WCFServiceWebRole1
         public bool AddClientOrder(string order_id, string id_order_product, string address, string order_status)
         {
             string query = "INSERT INTO CLient_order " +
-                "(order_id, id_order_product, address, order_status)";
-            query += " VALUES (@order_id, @id_order_product, @address, @order_status)";
+                "(Order_ID, ID_order_product,Adress, Order_status)";
+            query += " VALUES (@Order_ID, @ID_order_product, @Adress, @Order_status)";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@order_id", order_id);
-            myCommand.Parameters.AddWithValue("@id_order_product", id_order_product);
-            myCommand.Parameters.AddWithValue("@address", address);
-            myCommand.Parameters.AddWithValue(" @order_status", order_status);
+            myCommand.Parameters.AddWithValue("@Order_ID", order_id);
+            myCommand.Parameters.AddWithValue("@ID_order_product", id_order_product);
+            myCommand.Parameters.AddWithValue("@Adress", address);
+            myCommand.Parameters.AddWithValue("@Order_status", order_status);
             try
             {
                 myCommand.ExecuteNonQuery();
