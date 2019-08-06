@@ -12,16 +12,8 @@ namespace WCFServiceWebRole1
     [ServiceContract]
     public interface IService1
     {
-
-        // [OperationContract]
-        // string GetData(int value);
-
-        // [OperationContract]
-        //  CompositeType GetDataUsingDataContract(CompositeType composite);
-
         [OperationContract]
-        bool CreateProduct(string key,string price);
-       
+        bool AddProduct(string key, string size, string color, string price, string type);
     }
 
 
