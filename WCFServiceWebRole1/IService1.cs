@@ -14,6 +14,8 @@ namespace WCFServiceWebRole1
     {
         [OperationContract]
         bool AddProduct(string key, string size, string color, string price, string type);
+        [OperationContract]
+        bool UpdateProduct(string key, string size, string color, string price, string type);
 
         [OperationContract]
         bool AddOrderProduct(string id,string amount, string bar_code);

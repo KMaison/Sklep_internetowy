@@ -53,7 +53,6 @@ namespace WCFServiceWebRole1
 
         }
 
-
         public bool AddClient(string pesel, string first_name,string surname, string order_id)
         {
             string query = "INSERT INTO Client " +
@@ -137,5 +136,33 @@ namespace WCFServiceWebRole1
             }
             return true;
         }
+
+        public bool UpdateProduct(string key, string size, string color, string price, string type)
+        {
+            string query = "UPDATE Product SET Size = @Size, Color = @Color, Price = @Price, Clothes_type = @Clothes_type WHERE Bar_code = @Bar_code";
+
+            SqlConnection myConnection = GetSqlConnection();
+
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@Bar_code", key);
+            myCommand.Parameters.AddWithValue("@Size", size);
+            myCommand.Parameters.AddWithValue("@Color", color);
+            myCommand.Parameters.AddWithValue("@Price", price);
+            myCommand.Parameters.AddWithValue("@Clothes_type", type);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return true;
+        }
+        
     }
 }
