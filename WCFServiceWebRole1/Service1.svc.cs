@@ -17,15 +17,17 @@ namespace WCFServiceWebRole1
             SqlConnection c = new SqlConnection();
             c.ConnectionString =
             "Data Source=(localdb)\\MSSQLLocalDB;Database=WebStore;Trusted_Connection=true;";
-            try{
+            try
+            {
                 c.Open();
             }
-            catch (Exception e){
+            catch (Exception e)
+            {
                 return c; //todo
             }
             return c;
         }
-        public bool AddOrderProduct(string id,string amount, string bar_code)
+        public bool AddOrderProduct(string id, string amount, string bar_code)
         {
             string query = "INSERT INTO Order_products " +
                 "( Amount, Bar_code)";
@@ -53,7 +55,7 @@ namespace WCFServiceWebRole1
 
         }
 
-        public bool AddClient(string pesel, string first_name,string surname, string order_id)
+        public bool AddClient(string pesel, string first_name, string surname, string order_id)
         {
             string query = "INSERT INTO Client " +
                 "( PESEL,Firstname,Surname,Order_ID)";
@@ -119,19 +121,22 @@ namespace WCFServiceWebRole1
 
             SqlConnection myConnection = GetSqlConnection();
 
-            SqlCommand myCommand = new SqlCommand(query, myConnection); 
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Bar_code", key);
             myCommand.Parameters.AddWithValue("@Size", size);
             myCommand.Parameters.AddWithValue("@Color", color);
             myCommand.Parameters.AddWithValue("@Price", price);
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
-            try {
+            try
+            {
                 myCommand.ExecuteNonQuery();
             }
-            catch (Exception e){
+            catch (Exception e)
+            {
                 return false;
             }
-            finally{
+            finally
+            {
                 myConnection.Close();
             }
             return true;
@@ -163,6 +168,57 @@ namespace WCFServiceWebRole1
             }
             return true;
         }
-        
+
+        public bool UpdateOrderProduct(string id, string amount, string bar_code)
+        {
+            string query = "UPDATE Order_products SET Amount = @Amount,Bar_code = @Bar_code  WHERE ID_order_product=@ID_order_product ";
+
+            SqlConnection myConnection = GetSqlConnection();
+
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@ID_order_product", id);
+            myCommand.Parameters.AddWithValue("@Amount", amount);
+            myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return true;
+        }
+
+        public bool UpdateClient(string pesel, string first_name, string surname, string order_id)
+        {
+            string query = "UPDATE Client Firstname = @Firstname,Surname = @Surname,Order_ID=@Order_ID  WHERE PESEL=@PESEL ";
+
+            SqlConnection myConnection = GetSqlConnection();
+
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@PESEL", pesel);
+            myCommand.Parameters.AddWithValue("@Firstname", first_name);
+            myCommand.Parameters.AddWithValue("@Surname",surname);
+            myCommand.Parameters.AddWithValue("@Order_ID", order_id);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return true;
+
+        }
     }
 }
