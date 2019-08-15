@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
-using System.ServiceModel.Web;
-using System.Text;
 
 namespace WCFServiceWebRole1
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the interface name "IService1" in both code and config file together.
+    //TODO
+    //metody typu addProduct musza byc prywatne
+
     [ServiceContract]
     public interface IService1
     {
@@ -18,7 +17,7 @@ namespace WCFServiceWebRole1
         bool UpdateProduct(string key, string size, string color, string price, string type, string amount);
 
         [OperationContract]
-        bool AddOrderProduct(string id,string amount, string bar_code);
+        bool AddOrderProduct(string amount, string bar_code);
         [OperationContract]
         bool UpdateOrderProduct(string id, string amount, string bar_code);
 
@@ -29,30 +28,22 @@ namespace WCFServiceWebRole1
 
         [OperationContract]
         bool AddClientOrder(string order_id, string id_order_product, string address, string order_status);
+
         [OperationContract]
         bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status);
+
+        [OperationContract]
+        List<Product> GetProducts();
+
     }
 
-
-    // Use a data contract as illustrated in the sample below to add composite types to service operations.
-    [DataContract]
-    public class CompositeType
+    public class Product
     {
-        bool boolValue = true;
-        string stringValue = "Hello ";
-
-        [DataMember]
-        public bool BoolValue
-        {
-            get { return boolValue; }
-            set { boolValue = value; }
-        }
-
-        [DataMember]
-        public string StringValue
-        {
-            get { return stringValue; }
-            set { stringValue = value; }
-        }
-    }
+        public string Key { get; set; }
+        public string Size { get; set; }
+        public string Color { get; set; }
+        public string Price { get; set; }
+        public string Type { get; set; }
+        public string Amount { get; set; }
+    }   
 }

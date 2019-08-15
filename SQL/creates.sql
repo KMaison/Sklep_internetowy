@@ -3,7 +3,8 @@
 	Size VARCHAR(3) NOT NULL,
 	Color VARCHAR(20) NOT NULL,
 	Price MONEY NOT NULL,
-	Clothes_type VARCHAR(100) NOT NULL
+	Clothes_type VARCHAR(100) NOT NULL,
+	Amount INTEGER NOT null
 );
 
 CREATE TABLE Order_products(
