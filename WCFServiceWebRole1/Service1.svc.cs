@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-
+using Client.Domain;
 namespace WCFServiceWebRole1
 {
     public class Service1 : IService1
@@ -242,11 +242,12 @@ namespace WCFServiceWebRole1
             return true;
         }
 
-        public List<Product> GetProducts()
+        public ProductsList GetProducts()
         {
             string query = "SELECT * FROM Product";
             SqlDataReader myreader;
-            List<Product> products = new List<Product>();
+
+            ProductsList products= new ProductsList();
 
             SqlConnection myConnection = GetSqlConnection();
 
@@ -273,7 +274,7 @@ namespace WCFServiceWebRole1
                         Type = (myreader[4].ToString()),
                         Amount = (myreader[5].ToString())
                     };
-                    products.Add(product);
+                    products.list.Add(product);
                 }
                 myConnection.Close();                
             }
