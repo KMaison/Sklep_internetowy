@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Client.Domain
 {
-    public class Product 
+    public class Product
     {
         public string Key { get; set; }
+        public string Name { get; set; }
         public string Size { get; set; }
         public string Color { get; set; }
         public string Price { get; set; }

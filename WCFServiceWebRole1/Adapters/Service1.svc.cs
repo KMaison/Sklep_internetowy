@@ -23,17 +23,20 @@ namespace WCFServiceWebRole1
             return sqlConnection;
         }
 
-        public bool AddOrderProduct(string amount, string bar_code)
+        public bool AddOrderProduct(string id,string amount, string bar_code,string id_client_order)
         {
             string query = "INSERT INTO Order_products " +
-                "( Amount, Bar_code)";
-            query += " VALUES (@Amount,@Bar_code)";
+                "(ID_order_product,Amount, Bar_code,ID_client_order)";
+            query += " VALUES (@ID_order_product,@Amount,@Bar_code,@ID_client_order)";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@ID_order_product", id ?? (object)DBNull.Value);
             myCommand.Parameters.AddWithValue("@Amount", amount);
             myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
+            myCommand.Parameters.AddWithValue("@ID_client_order", id_client_order);
+           
             try
             {
                 myCommand.ExecuteNonQuery();
@@ -78,17 +81,16 @@ namespace WCFServiceWebRole1
 
         }
 
-        public bool AddClientOrder(string order_id, string id_order_product, string address, string order_status)
+        public bool AddClientOrder(string orderid,string address, string order_status)
         {
             string query = "INSERT INTO CLient_order " +
-                "(Order_ID, ID_order_product,Adress, Order_status)";
-            query += " VALUES (@Order_ID, @ID_order_product, @Adress, @Order_status)";
+                "(Order_ID,Adress, Order_status)";
+            query += " VALUES ( @Order_ID,@Adress, @Order_status)";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@Order_ID", order_id);
-            myCommand.Parameters.AddWithValue("@ID_order_product", id_order_product);
+            myCommand.Parameters.AddWithValue("@Order_ID", orderid);
             myCommand.Parameters.AddWithValue("@Adress", address);
             myCommand.Parameters.AddWithValue("@Order_status", order_status);
             try
@@ -107,19 +109,20 @@ namespace WCFServiceWebRole1
 
         }
 
-        public bool AddProduct(string key, string size, string color, string price, string type, string amount)
+        public bool AddProduct(string key,string name, string size, string color, string price, string type, string amount)
         {
             if(price.Contains(","))
                 price.Replace(',', '.');
 
             string query = "INSERT INTO Product " +
-                "(Bar_code, Size, Color, Price, Clothes_type,Amount)";
-            query += " VALUES (@Bar_code, @Size, @Color, @Price, @Clothes_type,@Amount)";
+                "(Bar_code,Name, Size, Color, Price, Clothes_type,Amount)";
+            query += " VALUES (@Bar_code,@Name, @Size, @Color, @Price, @Clothes_type,@Amount)";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Bar_code", key);
+            myCommand.Parameters.AddWithValue("@Name", name);
             myCommand.Parameters.AddWithValue("@Size", size);
             myCommand.Parameters.AddWithValue("@Color", color);
             myCommand.Parameters.AddWithValue("@Price", price);
