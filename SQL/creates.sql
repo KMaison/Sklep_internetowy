@@ -13,7 +13,7 @@ CREATE TABLE CLient_order(
     Order_status VARCHAR (200) CHECK (Order_status IN ('Complete', 'Processing', 'Canceled'))
 );
 CREATE TABLE Order_products(
-	ID_order_product INT IDENTITY(1,1) PRIMARY KEY,
+	ID_order_product INT PRIMARY KEY,
 	Amount INT NOT NULL,
 	Bar_code VARCHAR(5) REFERENCES Product NOT NULL,
 	ID_client_order INT REFERENCES Client_order NOT NULL
