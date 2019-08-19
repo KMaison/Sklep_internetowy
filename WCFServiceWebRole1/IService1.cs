@@ -36,7 +36,7 @@ namespace WCFServiceWebRole1
 
         [OperationContract]
         bool ifProductAmountEnough(string id, string amount);
-        
+
         [OperationContract]
         String[] SetProductList();
     }

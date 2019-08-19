@@ -254,7 +254,7 @@ namespace WCFServiceWebRole1
             SqlDataReader myreader;
 
             SqlConnection myConnection = GetSqlConnection();
-            String[] productList = new String[11];
+            String[] productList = new String[countProduct()];
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             try
             {
@@ -275,7 +275,8 @@ namespace WCFServiceWebRole1
                         myreader[2].ToString() + ";" +
                         myreader[3].ToString() + ";" +
                         myreader[4].ToString() + ";" +
-                        myreader[5].ToString();
+                        myreader[5].ToString() + ";" +
+                        myreader[6].ToString();
                     productList[i] = tmp;
                     i++;
 
@@ -334,6 +335,31 @@ namespace WCFServiceWebRole1
             myConnection.Close();
 
             return true;
+        }
+
+        private int countProduct()
+        {
+            string query = "SELECT COUNT(p.Name) FROM Product p  ";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+            int c;
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                c = Int32.Parse(myreader[0].ToString());
+            }
+            catch (Exception e)
+            {
+                return 0;
+            }
+            myConnection.Close();
+
+            return c;
+
         }
     }
    
