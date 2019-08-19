@@ -31,6 +31,15 @@ namespace WCFServiceWebRole1
         [OperationContract]
         bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status);
 
+<<<<<<< HEAD:WCFServiceWebRole1/IService1.cs
+=======
+        [OperationContract]
+        bool ifProductExist( string size, string color, string type);
+
+        [OperationContract]
+        bool ifProductAmountEnough(string id, string amount);
+
+>>>>>>> f6946e67008eefa86156f6794a661ba6b1cb87d7:WCFServiceWebRole1/Ports/IService1.cs
         [OperationContract]
         String[] SetProductList();
     }

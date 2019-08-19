@@ -286,6 +286,57 @@ namespace WCFServiceWebRole1
             }
             return products;
         }
+
+        public bool ifProductExist(string size, string color, string type)
+        {
+            string query = "SELECT p.Name FROM Product p WHERE (p.Size=@Size AND p.Color=@Color AND p.Clothes_type=@Type) ";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+
+            myCommand.Parameters.AddWithValue("@Size", size);
+            myCommand.Parameters.AddWithValue("@Color", color);
+            myCommand.Parameters.AddWithValue("@Type", type);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                var c = myreader[0];
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            myConnection.Close();
+
+            return true;
+        }
+        public bool ifProductAmountEnough(string id,string amount)
+        {
+            string query = "SELECT p.Name FROM Product p WHERE (p.Bar_code=@Bar_code AND p.Amount>=@Amount) ";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+            myCommand.Parameters.AddWithValue("@Bar_code", id);
+            myCommand.Parameters.AddWithValue("@Amount", amount);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                var c = myreader[0];
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            myConnection.Close();
+
+            return true;
+        }
     }
    
 }
