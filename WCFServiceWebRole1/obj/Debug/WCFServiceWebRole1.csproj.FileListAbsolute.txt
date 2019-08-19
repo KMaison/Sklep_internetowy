@@ -192,4 +192,3 @@ C:\Users\karol\OneDrive\Pulpit\TMP\Sklep_internetowy\WCFServiceWebRole1\bin\ru\S
 C:\Users\karol\OneDrive\Pulpit\TMP\Sklep_internetowy\WCFServiceWebRole1\bin\zh-Hans\System.Spatial.resources.dll
 C:\Users\karol\OneDrive\Pulpit\TMP\Sklep_internetowy\WCFServiceWebRole1\bin\zh-Hant\System.Spatial.resources.dll
 C:\Users\karol\OneDrive\Pulpit\TMP\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.csproj.CopyComplete
-C:\Users\karol\OneDrive\Pulpit\TMP\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.csprojAssemblyReference.cache
