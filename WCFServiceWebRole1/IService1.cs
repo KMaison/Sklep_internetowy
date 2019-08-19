@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Client.Domain;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.ServiceModel;
@@ -25,15 +26,14 @@ namespace WCFServiceWebRole1
         bool AddClient(string pesel, string first_name, string surname, string order_id);
         [OperationContract]
         bool UpdateClient(string pesel, string first_name, string surname, string order_id);
-
+        
         [OperationContract]
         bool AddClientOrder(string order_id, string id_order_product, string address, string order_status);
 
         [OperationContract]
         bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status);
-
+        
         [OperationContract]
-        ProductsList GetProducts();
-
+        String[] SetProductList();
     }
 }

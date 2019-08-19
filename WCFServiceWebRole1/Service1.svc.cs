@@ -242,15 +242,13 @@ namespace WCFServiceWebRole1
             return true;
         }
 
-        public ProductsList GetProducts()
+        public String[] SetProductList()
         {
             string query = "SELECT * FROM Product";
             SqlDataReader myreader;
 
-            ProductsList products= new ProductsList();
-
             SqlConnection myConnection = GetSqlConnection();
-
+            String[] productList = new String[11];
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             try
             {
@@ -261,25 +259,25 @@ namespace WCFServiceWebRole1
                 return null; //TODO
             }
             finally
-            {                
-                myreader = myCommand.ExecuteReader();                             
+            {
+                int i = 0;
+                myreader = myCommand.ExecuteReader();
                 while (myreader.Read())
                 {
-                    Product product = new Product
-                    {
-                        Key = (myreader[0].ToString()),
-                        Size = (myreader[1].ToString()),
-                        Color = (myreader[2].ToString()),
-                        Price = (myreader[3].ToString()),
-                        Type = (myreader[4].ToString()),
-                        Amount = (myreader[5].ToString())
-                    };
-                    products.list.Add(product);
+                    String tmp = myreader[0].ToString()+";"+
+                        myreader[1].ToString() + ";" +
+                        myreader[2].ToString() + ";" +
+                        myreader[3].ToString() + ";" +
+                        myreader[4].ToString() + ";" +
+                        myreader[5].ToString();
+                productList[i] = tmp;
+                    i++;
+
                 }
-                myConnection.Close();                
             }
-            return products;
+            myConnection.Close();
+            return productList;
         }
     }
-   
+
 }
