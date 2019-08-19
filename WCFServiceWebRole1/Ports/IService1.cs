@@ -30,6 +30,13 @@ namespace WCFServiceWebRole1
         bool AddClientOrder(string orderid,string address, string order_status);
         [OperationContract]
         bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status);
+
+        [OperationContract]
+        bool ifProductExist( string size, string color, string type);
+
+        [OperationContract]
+        bool ifProductAmountEnough(string id, string amount);
+
         [OperationContract]
         ProductsList GetProducts();
     }
