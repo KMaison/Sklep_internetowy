@@ -17,14 +17,17 @@ namespace WCFServiceWebRole1
         bool UpdateProduct(string key, string size, string color, string price, string type, string amount);
 
         [OperationContract]
-        bool AddOrderProduct(string id,string amount, string bar_code, string id_client_order);
+        bool AddOrderProduct(string amount, string bar_code, string id_client_order);
         [OperationContract]
         bool UpdateOrderProduct(string id, string amount, string bar_code);
 
         [OperationContract]
-        bool AddClient(string pesel, string first_name, string surname, string order_id);
+        bool AddClient(string first_name, string surname, string order_id);
         [OperationContract]
         bool UpdateClient(string pesel, string first_name, string surname, string order_id);
+
+        [OperationContract]
+        int CreateClientOrder(string address);
 
         [OperationContract]
         bool AddClientOrder(string orderid,string address, string order_status);

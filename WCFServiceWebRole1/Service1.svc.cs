@@ -23,20 +23,19 @@ namespace WCFServiceWebRole1
             return sqlConnection;
         }
 
-        public bool AddOrderProduct(string id,string amount, string bar_code,string id_client_order)
+        public bool AddOrderProduct(string amount, string bar_code, string id_client_order)
         {
             string query = "INSERT INTO Order_products " +
-                "(ID_order_product,Amount, Bar_code,ID_client_order)";
-            query += " VALUES (@ID_order_product,@Amount,@Bar_code,@ID_client_order)";
+                "(Amount, Bar_code,ID_client_order)";
+            query += " VALUES (@Amount,@Bar_code,@ID_client_order)";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@ID_order_product", id ?? (object)DBNull.Value);
             myCommand.Parameters.AddWithValue("@Amount", amount);
             myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
             myCommand.Parameters.AddWithValue("@ID_client_order", id_client_order);
-           
+
             try
             {
                 myCommand.ExecuteNonQuery();
@@ -52,16 +51,15 @@ namespace WCFServiceWebRole1
             return true;
         }
 
-        public bool AddClient(string pesel, string first_name, string surname, string order_id)
+        public bool AddClient(string first_name, string surname, string order_id)
         {
             string query = "INSERT INTO Client " +
-                "( PESEL,Firstname,Surname,Order_ID)";
-            query += " VALUES ( @PESEL,@Firstname,@Surname,@Order_ID)";
+                "(Firstname,Surname,Order_ID)";
+            query += " VALUES (@Firstname,@Surname,@Order_ID)";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@PESEL", pesel);
             myCommand.Parameters.AddWithValue("@Firstname", first_name);
             myCommand.Parameters.AddWithValue("@Surname", surname);
             myCommand.Parameters.AddWithValue("@Order_ID", order_id);
@@ -81,7 +79,7 @@ namespace WCFServiceWebRole1
 
         }
 
-        public bool AddClientOrder(string orderid,string address, string order_status)
+        public bool AddClientOrder(string orderid, string address, string order_status)
         {
             string query = "INSERT INTO CLient_order " +
                 "(Order_ID,Adress, Order_status)";
@@ -109,9 +107,9 @@ namespace WCFServiceWebRole1
 
         }
 
-        public bool AddProduct(string key,string name, string size, string color, string price, string type, string amount)
+        public bool AddProduct(string key, string name, string size, string color, string price, string type, string amount)
         {
-            if(price.Contains(","))
+            if (price.Contains(","))
                 price.Replace(',', '.');
 
             string query = "INSERT INTO Product " +
@@ -361,6 +359,41 @@ namespace WCFServiceWebRole1
             return c;
 
         }
+
+        public int CreateClientOrder(string address)
+        {
+
+            string status = "Processing";
+            int id=0;
+            bool correct = false;
+            while (!correct)
+            {
+                id = new Random().Next(100, 9999999);
+
+                string query = "SELECT p.Order_ID FROM Client_order p WHERE (p.Order_ID=@id) ";
+
+                SqlConnection myConnection = GetSqlConnection();
+                SqlCommand myCommand = new SqlCommand(query, myConnection);
+                SqlDataReader myreader;
+                myCommand.Parameters.AddWithValue("@id", id);
+                try
+                {
+                    myCommand.ExecuteNonQuery();
+                    myreader = myCommand.ExecuteReader();
+                    myreader.Read();
+                    var c = myreader[0];
+                }
+                catch
+                {
+                    correct = true;
+                }
+                myConnection.Close();
+            }
+            
+            AddClientOrder(id.ToString(), address, status);
+
+
+            return id;
+        }
     }
-   
 }
