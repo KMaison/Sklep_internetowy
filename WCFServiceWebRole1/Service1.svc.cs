@@ -113,8 +113,8 @@ namespace WCFServiceWebRole1
                 price.Replace(',', '.');
 
             string query = "INSERT INTO Product " +
-                "(Bar_code,Name, Size, Color, Price, Clothes_type,Amount)";
-            query += " VALUES (@Bar_code,@Name, @Size, @Color, @Price, @Clothes_type,@Amount)";
+                "(Bar_code,Name, Size, Color, Price, Clothes_type,Amount_Reserved,Amount_To_Reserve)";
+            query += " VALUES (@Bar_code,@Name, @Size, @Color, @Price, @Clothes_type,@Amount_Reserved,@Amount_To_Reserve)";
 
             SqlConnection myConnection = GetSqlConnection();
 
@@ -125,7 +125,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Color", color);
             myCommand.Parameters.AddWithValue("@Price", price);
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
-            myCommand.Parameters.AddWithValue("@Amount", amount);
+            myCommand.Parameters.AddWithValue("@Amount_Reserved", 0);
+            myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount);
             try
             {
                 myCommand.ExecuteNonQuery();
@@ -141,9 +142,11 @@ namespace WCFServiceWebRole1
             return true;
         }
 
-        public bool UpdateProduct(string key, string size, string color, string price, string type, string amount)
+        public bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve)
         {
-            string query = "UPDATE Product SET Size = @Size, Color = @Color, Price = @Price, Clothes_type = @Clothes_type, Amount=@Amount WHERE Bar_code = @Bar_code";
+            string query = "UPDATE Product SET ";
+               query += "Size = @Size, Color = @Color, Price = @Price, Clothes_type = @Clothes_type, Amount_Reserved= @Amount_Reserved, Amount_To_Reserve= @Amount_To_Reserve";
+                query+=" WHERE Bar_code = @Bar_code";
 
             SqlConnection myConnection = GetSqlConnection();
 
@@ -153,7 +156,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Color", color);
             myCommand.Parameters.AddWithValue("@Price", price);
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
-            myCommand.Parameters.AddWithValue("@Amount", amount);
+            myCommand.Parameters.AddWithValue("@Amount_Reserved", amount_Reserved);
+            myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
             try
             {
                 myCommand.ExecuteNonQuery();
@@ -246,7 +250,7 @@ namespace WCFServiceWebRole1
             return true;
         }
 
-        public String[] SetProductList()
+        public String[] GetProductList()
         {
             string query = "SELECT * FROM Product";
             SqlDataReader myreader;
@@ -274,7 +278,8 @@ namespace WCFServiceWebRole1
                         myreader[3].ToString() + ";" +
                         myreader[4].ToString() + ";" +
                         myreader[5].ToString() + ";" +
-                        myreader[6].ToString();
+                        myreader[6].ToString() + ";" +
+                        myreader[7].ToString();
                     productList[i] = tmp;
                     i++;
 
@@ -312,7 +317,7 @@ namespace WCFServiceWebRole1
         }
         public bool ifProductAmountEnough(string id, string amount)
         {
-            string query = "SELECT p.Name FROM Product p WHERE (p.Bar_code=@Bar_code AND p.Amount>=@Amount) ";
+            string query = "SELECT p.Name FROM Product p WHERE (p.Bar_code=@Bar_code AND p.Amount_To_Reserve>=@Amount) ";
 
             SqlConnection myConnection = GetSqlConnection();
             SqlCommand myCommand = new SqlCommand(query, myConnection);

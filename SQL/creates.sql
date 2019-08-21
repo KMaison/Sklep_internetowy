@@ -4,8 +4,9 @@
 	Size VARCHAR(3) NOT NULL,
 	Color VARCHAR(20) NOT NULL,
 	Price MONEY NOT NULL,
-	Clothes_type VARCHAR(100) NOT NULL,
-	Amount INTEGER NOT null
+	Clothes_type VARCHAR(100) NOT NULL,	
+	Amount_Reserved INT NOT NULL,
+	Amount_To_Reserve INT NOT NULL
 );
 CREATE TABLE CLient_order(
 	Order_ID INT PRIMARY KEY,

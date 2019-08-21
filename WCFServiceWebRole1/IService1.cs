@@ -5,16 +5,13 @@ using System.ServiceModel;
 
 namespace WCFServiceWebRole1
 {
-    //TODO
-    //metody typu addProduct musza byc prywatne
-
     [ServiceContract]
     public interface IService1
     {
         [OperationContract]
         bool AddProduct(string key, string name, string size, string color, string price, string type, string amount);
         [OperationContract]
-        bool UpdateProduct(string key, string size, string color, string price, string type, string amount);
+        bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve);
 
         [OperationContract]
         bool AddOrderProduct(string amount, string bar_code, string id_client_order);
@@ -41,6 +38,6 @@ namespace WCFServiceWebRole1
         bool ifProductAmountEnough(string id, string amount);
 
         [OperationContract]
-        String[] SetProductList();
+        String[] GetProductList();
     }
 }
