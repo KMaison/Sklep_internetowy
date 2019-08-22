@@ -22,20 +22,8 @@ namespace WCFServiceWebRole1
             }
             return sqlConnection;
         }
-
-        public bool AddOrderProduct(string amount, string bar_code, string id_client_order)
+        private bool RunQuery(SqlConnection myConnection, SqlCommand myCommand)
         {
-            string query = "INSERT INTO Order_products " +
-                "(Amount, Bar_code,ID_client_order)";
-            query += " VALUES (@Amount,@Bar_code,@ID_client_order)";
-
-            SqlConnection myConnection = GetSqlConnection();
-
-            SqlCommand myCommand = new SqlCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@Amount", amount);
-            myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
-            myCommand.Parameters.AddWithValue("@ID_client_order", id_client_order);
-
             try
             {
                 myCommand.ExecuteNonQuery();
@@ -49,6 +37,21 @@ namespace WCFServiceWebRole1
                 myConnection.Close();
             }
             return true;
+        }
+
+        public bool AddOrderProduct(string amount, string bar_code, string id_client_order)
+        {
+            string query = "INSERT INTO Order_products " +
+                "(Amount, Bar_code,ID_client_order)";
+            query += " VALUES (@Amount,@Bar_code,@ID_client_order)";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@Amount", amount);
+            myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
+            myCommand.Parameters.AddWithValue("@ID_client_order", id_client_order);
+
+            return RunQuery( myConnection,myCommand);
         }
 
         public bool AddClient(string first_name, string surname, string order_id)
@@ -63,20 +66,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Firstname", first_name);
             myCommand.Parameters.AddWithValue("@Surname", surname);
             myCommand.Parameters.AddWithValue("@Order_ID", order_id);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
 
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool AddClientOrder(string orderid, string address, string order_status)
@@ -91,20 +82,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Order_ID", orderid);
             myCommand.Parameters.AddWithValue("@Adress", address);
             myCommand.Parameters.AddWithValue("@Order_status", order_status);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
 
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool AddProduct(string key, string name, string size, string color, string price, string type, string amount)
@@ -127,19 +106,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
             myCommand.Parameters.AddWithValue("@Amount_Reserved", 0);
             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
+
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve)
@@ -158,19 +126,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
             myCommand.Parameters.AddWithValue("@Amount_Reserved", amount_Reserved);
             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
+
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool UpdateOrderProduct(string id, string amount, string bar_code)
@@ -183,19 +140,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@ID_order_product", id);
             myCommand.Parameters.AddWithValue("@Amount", amount);
             myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
+
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool UpdateClient(string pesel, string first_name, string surname, string order_id)
@@ -209,19 +155,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Firstname", first_name);
             myCommand.Parameters.AddWithValue("@Surname", surname);
             myCommand.Parameters.AddWithValue("@Order_ID", order_id);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
+
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status)
@@ -235,19 +170,8 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@ID_order_product", id_order_product);
             myCommand.Parameters.AddWithValue("@Adress", address);
             myCommand.Parameters.AddWithValue("@Order_status", order_status);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
-            }
-            finally
-            {
-                myConnection.Close();
-            }
-            return true;
+
+            return RunQuery(myConnection, myCommand);
         }
 
         public String[] GetProductList()
@@ -314,6 +238,31 @@ namespace WCFServiceWebRole1
             myConnection.Close();
 
             return true;
+        }
+        public string getProductPrice(string id)
+        {
+            string query = "SELECT p.Price FROM Product p WHERE (p.Bar_code=@Bar_code) ";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+            var c=new Object();
+
+            myCommand.Parameters.AddWithValue("@Bar_code", id);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                c = myreader[0];
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            myConnection.Close();
+
+            return c.ToString();
         }
         public bool ifProductAmountEnough(string id, string amount)
         {
