@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Client.Domain
+namespace WCFServiceWebRole1.Domain
 {
     public class Product
     {
