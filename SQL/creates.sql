@@ -4,8 +4,9 @@
 	Size VARCHAR(3) NOT NULL,
 	Color VARCHAR(20) NOT NULL,
 	Price MONEY NOT NULL,
-	Clothes_type VARCHAR(100) NOT NULL,
-	Amount INTEGER NOT null
+	Clothes_type VARCHAR(100) NOT NULL,	
+	Amount_Reserved INT NOT NULL,
+	Amount_To_Reserve INT NOT NULL
 );
 CREATE TABLE CLient_order(
 	Order_ID INT PRIMARY KEY,
@@ -19,7 +20,7 @@ CREATE TABLE Order_products(
 	ID_client_order INT REFERENCES Client_order NOT NULL
 );
 CREATE TABLE Client(
-	PESEL VARCHAR(11) PRIMARY KEY,
+	Client_ID INT IDENTITY(1,1) PRIMARY KEY,
 	Firstname VARCHAR(100) NOT NULL,
 	Surname VARCHAR(100) NOT NULL,
 	Order_ID INT REFERENCES Client_order NOT NULL
