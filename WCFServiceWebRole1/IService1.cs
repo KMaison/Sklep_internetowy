@@ -27,17 +27,23 @@ namespace WCFServiceWebRole1
         int CreateClientOrder(string address);
 
         [OperationContract]
-        bool AddClientOrder(string orderid,string address, string order_status);
+        bool AddClientOrder(string orderid, string address, string order_status);
         [OperationContract]
         bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status);
-        
+
         [OperationContract]
-        bool ifProductExist( string size, string color, string type);
+        bool ifProductExist(string size, string color, string type);
 
         [OperationContract]
         bool ifProductAmountEnough(string id, string amount);
 
         [OperationContract]
         String[] GetProductList();
+        
+        [OperationContract]
+        bool ReserveProduct(string key, string amount);
+
+        [OperationContract]
+        int GetAmount_To_Reserve(string id);
     }
 }

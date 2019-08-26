@@ -142,7 +142,7 @@ namespace WCFServiceWebRole1
             return true;
         }
 
-        public bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve)
+        public bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve)//czy ta metoda wgl jest potrzebna??
         {
             string query = "UPDATE Product SET ";
                query += "Size = @Size, Color = @Color, Price = @Price, Clothes_type = @Clothes_type, Amount_Reserved= @Amount_Reserved, Amount_To_Reserve= @Amount_To_Reserve";
@@ -399,6 +399,63 @@ namespace WCFServiceWebRole1
 
 
             return id;
+        }
+
+        public bool ReserveProduct(string key, string amount)
+        {
+
+            string query = "UPDATE Product SET ";
+            query += "Amount_Reserved= @Amount_Reserved, Amount_To_Reserve= @Amount_To_Reserve";
+            query += " WHERE Bar_code = @Bar_code";
+
+            SqlConnection myConnection = GetSqlConnection();
+
+            int amount_To_Reserve = GetAmount_To_Reserve(key) - Int32.Parse(amount);
+            if (amount_To_Reserve < 0)
+                return false;
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@Bar_code", key);
+            myCommand.Parameters.AddWithValue("@Amount_Reserved", amount);
+             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            finally
+            {
+                myConnection.Close();
+            }
+            return true;
+        }
+
+
+        public int GetAmount_To_Reserve(string id)
+        {
+            string query = "SELECT p.Amount_To_Reserve FROM Product p WHERE (p.Bar_code=@Bar_code)";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+            myCommand.Parameters.AddWithValue("@Bar_code", id);
+            int c;
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                c = Int32.Parse(myreader[0].ToString());
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
+            myConnection.Close();
+
+            return c;
         }
     }
 }
