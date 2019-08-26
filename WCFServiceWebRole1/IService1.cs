@@ -45,5 +45,8 @@ namespace WCFServiceWebRole1
 
         [OperationContract]
         int GetAmount_To_Reserve(string id);
+
+        [OperationContract]
+        string getProductPrice(string id);
     }
 }
