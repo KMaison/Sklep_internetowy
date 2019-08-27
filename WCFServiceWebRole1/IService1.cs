@@ -9,19 +9,15 @@ namespace WCFServiceWebRole1
     public interface IService1
     {
         [OperationContract]
-        bool AddProduct(string key, string name, string size, string color, string price, string type, string amount);
+        bool AddProduct(string name, string size, string color, string price, string type, string amount);
         [OperationContract]
         bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve);
 
         [OperationContract]
         bool AddOrderProduct(string amount, string bar_code, string id_client_order);
-        [OperationContract]
-        bool UpdateOrderProduct(string id, string amount, string bar_code);
 
         [OperationContract]
         bool AddClient(string first_name, string surname, string order_id);
-        [OperationContract]
-        bool UpdateClient(string pesel, string first_name, string surname, string order_id);
 
         [OperationContract]
         int CreateClientOrder(string address);
@@ -29,11 +25,8 @@ namespace WCFServiceWebRole1
         [OperationContract]
         bool AddClientOrder(string orderid, string address, string order_status);
         [OperationContract]
-        bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status);
-
-        [OperationContract]
-        bool ifProductExist(string size, string color, string type);
-
+        bool UpdateClientOrder(string order_id, string order_status);
+        
         [OperationContract]
         bool ifProductAmountEnough(string id, string amount);
 
