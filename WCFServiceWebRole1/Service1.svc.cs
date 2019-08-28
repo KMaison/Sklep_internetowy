@@ -165,19 +165,7 @@ namespace WCFServiceWebRole1
             return RunQuery(myConnection, myCommand);
         }
 
-        public bool UpdateClientOrder(string order_id, string order_status) //TODO: po kupieniu zmienic status zamowienia, sprawdzic poprawnosc metody
-        {
-            string query = "UPDATE Client_order SET Order_status=@Order_status WHERE Order_ID=@Order_ID ";
-
-            SqlConnection myConnection = GetSqlConnection();
-
-            SqlCommand myCommand = new SqlCommand(query, myConnection);
-            myCommand.Parameters.AddWithValue("@ID_order_product", id);
-            myCommand.Parameters.AddWithValue("@Amount", amount);
-            myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
-
-            return RunQuery(myConnection, myCommand);
-        }
+     
 
         public bool UpdateClient(string pesel, string first_name, string surname, string order_id)
         {
@@ -273,6 +261,7 @@ namespace WCFServiceWebRole1
 
             return true;
         }
+       
         public string getProductPrice(string id)
         {
             string query = "SELECT p.Price FROM Product p WHERE (p.Bar_code=@Bar_code) ";
@@ -280,7 +269,7 @@ namespace WCFServiceWebRole1
             SqlConnection myConnection = GetSqlConnection();
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             SqlDataReader myreader;
-            var c=new Object();
+            var c = new Object();
 
             myCommand.Parameters.AddWithValue("@Bar_code", id);
             try
@@ -298,8 +287,7 @@ namespace WCFServiceWebRole1
 
             return c.ToString();
         }
-        public bool ifProductAmountEnough(string id, string amount) { }
-
+        
         private int CountProduct()
 
         {
@@ -396,31 +384,7 @@ namespace WCFServiceWebRole1
             return c;
         }
 
-        public string getProductPrice(string id)
-        {
-            string query = "SELECT p.Price FROM Product p WHERE (p.Bar_code=@Bar_code) ";
-
-            SqlConnection myConnection = GetSqlConnection();
-            SqlCommand myCommand = new SqlCommand(query, myConnection);
-            SqlDataReader myreader;
-            var c = new Object();
-
-            myCommand.Parameters.AddWithValue("@Bar_code", id);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-                myreader = myCommand.ExecuteReader();
-                myreader.Read();
-                c = myreader[0];
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-            myConnection.Close();
-
-            return c.ToString();
-        }
+        
 
         public bool BuyProduct(string key, string amount)
         {

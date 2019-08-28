@@ -28,8 +28,7 @@ namespace WCFServiceWebRole1
         [OperationContract]
         bool BuyProduct(string key, string amount);
 
-        [OperationContract]
-        bool UpdateClientOrder(string order_id, string order_status);
+        
         
         [OperationContract]
         bool ifProductAmountEnough(string id, string amount);
@@ -43,7 +42,6 @@ namespace WCFServiceWebRole1
         [OperationContract]
         bool ReserveProduct(string key, string amount);
 
-        [OperationContract]
-        string getProductPrice(string id);
+        
     }
 }
