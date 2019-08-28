@@ -24,6 +24,10 @@ namespace WCFServiceWebRole1
 
         [OperationContract]
         bool AddClientOrder(string orderid, string address, string order_status);
+
+        [OperationContract]
+        bool BuyProduct(string key, string amount);
+
         [OperationContract]
         bool UpdateClientOrder(string order_id, string order_status);
         
@@ -35,9 +39,6 @@ namespace WCFServiceWebRole1
         
         [OperationContract]
         bool ReserveProduct(string key, string amount);
-
-        [OperationContract]
-        int GetAmount_To_Reserve(string id);
 
         [OperationContract]
         string getProductPrice(string id);

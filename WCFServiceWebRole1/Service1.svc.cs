@@ -76,7 +76,7 @@ namespace WCFServiceWebRole1
         {
 
             string status = "Processing";
-            int id=0;
+            int id = 0;
             bool correct = false;
             while (!correct)
             {
@@ -101,8 +101,8 @@ namespace WCFServiceWebRole1
                 }
                 myConnection.Close();
             }
-            
-           bool x = AddClientOrder(id.ToString(), address, status);
+
+            bool x = AddClientOrder(id.ToString(), address, status);
 
 
             return id;
@@ -143,14 +143,14 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
             myCommand.Parameters.AddWithValue("@Amount_Reserved", 0);
             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount);
-            return RunQuery(myConnection, myCommand);          
+            return RunQuery(myConnection, myCommand);
         }
 
         public bool UpdateProduct(string key, string size, string color, string price, string type, string amount_Reserved, string amount_To_Reserve)//czy ta metoda wgl jest potrzebna??
         {
             string query = "UPDATE Product SET ";
-               query += "Size = @Size, Color = @Color, Price = @Price, Clothes_type = @Clothes_type, Amount_Reserved= @Amount_Reserved, Amount_To_Reserve= @Amount_To_Reserve";
-                query+=" WHERE Bar_code = @Bar_code";
+            query += "Size = @Size, Color = @Color, Price = @Price, Clothes_type = @Clothes_type, Amount_Reserved= @Amount_Reserved, Amount_To_Reserve= @Amount_To_Reserve";
+            query += " WHERE Bar_code = @Bar_code";
 
             SqlConnection myConnection = GetSqlConnection();
 
@@ -164,7 +164,7 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
             return RunQuery(myConnection, myCommand);
         }
-        
+
         public bool UpdateClientOrder(string order_id, string order_status) //TODO: po kupieniu zmienic status zamowienia, sprawdzic poprawnosc metody
         {
             string query = "UPDATE Client_order SET Order_status=@Order_status WHERE Order_ID=@Order_ID ";
@@ -268,7 +268,6 @@ namespace WCFServiceWebRole1
 
         public bool ReserveProduct(string key, string amount)
         {
-
             string query = "UPDATE Product SET ";
             query += "Amount_Reserved= @Amount_Reserved, Amount_To_Reserve= @Amount_To_Reserve";
             query += " WHERE Bar_code = @Bar_code";
@@ -276,19 +275,45 @@ namespace WCFServiceWebRole1
             SqlConnection myConnection = GetSqlConnection();
 
             int amount_To_Reserve = GetAmount_To_Reserve(key) - Int32.Parse(amount);
-            if (amount_To_Reserve < 0)
+            int amount_reserved = GetAmount_Reserved(key) + Int32.Parse(amount);
+            if (amount_To_Reserve < 0 || amount_reserved < 0)
                 return false;
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Bar_code", key);
-            myCommand.Parameters.AddWithValue("@Amount_Reserved", amount);
-             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
+            myCommand.Parameters.AddWithValue("@Amount_Reserved", amount_reserved);
+            myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
             return RunQuery(myConnection, myCommand);
         }
 
 
-        public int GetAmount_To_Reserve(string id)
+        int GetAmount_To_Reserve(string id)
         {
             string query = "SELECT p.Amount_To_Reserve FROM Product p WHERE (p.Bar_code=@Bar_code)";
+
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+            myCommand.Parameters.AddWithValue("@Bar_code", Int32.Parse(id));
+            int c;
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                c = Int32.Parse(myreader[0].ToString());
+            }
+            catch (Exception e)
+            {
+                return -1;
+            }
+            myConnection.Close();
+
+            return c;
+        }
+
+        int GetAmount_Reserved(string id)
+        {
+            string query = "SELECT p.Amount_Reserved FROM Product p WHERE (p.Bar_code=@Bar_code)";
 
             SqlConnection myConnection = GetSqlConnection();
             SqlCommand myCommand = new SqlCommand(query, myConnection);
@@ -335,6 +360,22 @@ namespace WCFServiceWebRole1
             myConnection.Close();
 
             return c.ToString();
+        }
+
+        public bool BuyProduct(string key, string amount)
+        {
+            string query = "UPDATE Product SET ";
+            query += "Amount_Reserved= @Amount_Reserved WHERE Bar_code = @Bar_code";
+
+            SqlConnection myConnection = GetSqlConnection();
+
+            int amount_Reserved = GetAmount_Reserved(key) - Int32.Parse(amount);
+            if (amount_Reserved < 0)
+                return false;
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@Bar_code", key);
+            myCommand.Parameters.AddWithValue("@Amount_Reserved", amount_Reserved);
+            return RunQuery(myConnection, myCommand);
         }
     }
 }
