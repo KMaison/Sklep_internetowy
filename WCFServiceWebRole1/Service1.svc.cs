@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
-using Client.Domain;
+using System.ServiceModel;
+
 namespace WCFServiceWebRole1
 {
     public class Service1 : IService1
@@ -22,15 +22,33 @@ namespace WCFServiceWebRole1
             }
             return sqlConnection;
         }
+
         private bool RunQuery(SqlConnection myConnection, SqlCommand myCommand)
         {
             try
             {
-                myCommand.ExecuteNonQuery();
-            }
-            catch (Exception e)
-            {
-                return false;
+                using (SqlTransaction transaction = myConnection.BeginTransaction())
+                {
+                    var rollback = false;
+                    try
+                    {
+                        myCommand.ExecuteNonQuery();
+                    }
+                    catch (Exception e)
+                    {
+                        rollback = true;
+                    }
+                    if (rollback)
+                    {
+                        transaction.Rollback();
+                        myConnection.Close();
+                        return false;
+                    }
+                    else
+                    {
+                        transaction.Commit();
+                    }
+                }
             }
             finally
             {
@@ -39,6 +57,7 @@ namespace WCFServiceWebRole1
             return true;
         }
 
+        [OperationBehavior(TransactionScopeRequired = true)]
         public bool AddOrderProduct(string amount, string bar_code, string id_client_order)
         {
             string query = "INSERT INTO Order_products " +
@@ -55,6 +74,7 @@ namespace WCFServiceWebRole1
             return RunQuery(myConnection, myCommand);
         }
 
+        [OperationBehavior(TransactionScopeRequired = true)]
         public bool AddClient(string first_name, string surname, string order_id)
         {
             string query = "INSERT INTO Client " +
@@ -72,6 +92,7 @@ namespace WCFServiceWebRole1
             return RunQuery(myConnection, myCommand);
         }
 
+        [TransactionFlow(TransactionFlowOption.Mandatory)]
         public int CreateClientOrder(string address)
         {
 
@@ -165,7 +186,7 @@ namespace WCFServiceWebRole1
             return RunQuery(myConnection, myCommand);
         }
 
-     
+
 
         public bool UpdateClient(string pesel, string first_name, string surname, string order_id)
         {
@@ -261,7 +282,7 @@ namespace WCFServiceWebRole1
 
             return true;
         }
-       
+
         public string getProductPrice(string id)
         {
             string query = "SELECT p.Price FROM Product p WHERE (p.Bar_code=@Bar_code) ";
@@ -287,7 +308,7 @@ namespace WCFServiceWebRole1
 
             return c.ToString();
         }
-        
+
         private int CountProduct()
 
         {
@@ -384,8 +405,7 @@ namespace WCFServiceWebRole1
             return c;
         }
 
-        
-
+        [TransactionFlow(TransactionFlowOption.Mandatory)]
         public bool BuyProduct(string key, string amount)
         {
             string query = "UPDATE Product SET ";
@@ -395,7 +415,10 @@ namespace WCFServiceWebRole1
 
             int amount_Reserved = GetAmount_Reserved(key) - Int32.Parse(amount);
             if (amount_Reserved < 0)
+            {
                 return false;
+            }
+
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Bar_code", key);
             myCommand.Parameters.AddWithValue("@Amount_Reserved", amount_Reserved);
