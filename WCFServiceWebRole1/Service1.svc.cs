@@ -22,7 +22,6 @@ namespace WCFServiceWebRole1
             }
             return sqlConnection;
         }
-
         private bool RunQuery(SqlConnection myConnection, SqlCommand myCommand)
         {
             try
@@ -47,11 +46,11 @@ namespace WCFServiceWebRole1
             query += " VALUES (@Amount,@Bar_code,@ID_client_order)";
 
             SqlConnection myConnection = GetSqlConnection();
-
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Amount", amount);
             myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
             myCommand.Parameters.AddWithValue("@ID_client_order", id_client_order);
+
 
             return RunQuery(myConnection, myCommand);
         }
@@ -67,6 +66,7 @@ namespace WCFServiceWebRole1
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Firstname", first_name);
             myCommand.Parameters.AddWithValue("@Surname", surname);
+
             myCommand.Parameters.AddWithValue("@ID_client_order", order_id);
 
             return RunQuery(myConnection, myCommand);
@@ -103,8 +103,6 @@ namespace WCFServiceWebRole1
             }
 
             bool x = AddClientOrder(id.ToString(), address, status);
-
-
             return id;
         }
 
@@ -143,6 +141,7 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
             myCommand.Parameters.AddWithValue("@Amount_Reserved", 0);
             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount);
+
             return RunQuery(myConnection, myCommand);
         }
 
@@ -162,18 +161,40 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@Clothes_type", type);
             myCommand.Parameters.AddWithValue("@Amount_Reserved", amount_Reserved);
             myCommand.Parameters.AddWithValue("@Amount_To_Reserve", amount_To_Reserve);
+
             return RunQuery(myConnection, myCommand);
         }
 
-        public bool UpdateClientOrder(string order_id, string order_status) //TODO: po kupieniu zmienic status zamowienia, sprawdzic poprawnosc metody
+     
+
+        public bool UpdateClient(string pesel, string first_name, string surname, string order_id)
         {
-            string query = "UPDATE Client_order SET Order_status=@Order_status WHERE Order_ID=@Order_ID ";
+            string query = "UPDATE Client SET Firstname = @Firstname, Surname = @Surname, Order_ID=@Order_ID  WHERE PESEL=@PESEL ";
+
+            SqlConnection myConnection = GetSqlConnection();
+
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            myCommand.Parameters.AddWithValue("@PESEL", pesel);
+            myCommand.Parameters.AddWithValue("@Firstname", first_name);
+            myCommand.Parameters.AddWithValue("@Surname", surname);
+            myCommand.Parameters.AddWithValue("@Order_ID", order_id);
+
+            return RunQuery(myConnection, myCommand);
+        }
+
+        public bool UpdateClientOrder(string order_id, string id_order_product, string address, string order_status)
+        {
+            string query = "UPDATE Client_order SET ID_order_product = @ID_order_product, Adress = @Adress, Order_status=@Order_status  WHERE Order_ID=@Order_ID ";
 
             SqlConnection myConnection = GetSqlConnection();
 
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Order_ID", order_id);
+            myCommand.Parameters.AddWithValue("@ID_order_product", id_order_product);
+            myCommand.Parameters.AddWithValue("@Adress", address);
             myCommand.Parameters.AddWithValue("@Order_status", order_status);
+            myCommand.Parameters.AddWithValue("@Order_ID", order_id);
+
             return RunQuery(myConnection, myCommand);
         }
 
@@ -240,8 +261,35 @@ namespace WCFServiceWebRole1
 
             return true;
         }
+       
+        public string getProductPrice(string id)
+        {
+            string query = "SELECT p.Price FROM Product p WHERE (p.Bar_code=@Bar_code) ";
 
+            SqlConnection myConnection = GetSqlConnection();
+            SqlCommand myCommand = new SqlCommand(query, myConnection);
+            SqlDataReader myreader;
+            var c = new Object();
+
+            myCommand.Parameters.AddWithValue("@Bar_code", id);
+            try
+            {
+                myCommand.ExecuteNonQuery();
+                myreader = myCommand.ExecuteReader();
+                myreader.Read();
+                c = myreader[0];
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+            myConnection.Close();
+
+            return c.ToString();
+        }
+        
         private int CountProduct()
+
         {
             string query = "SELECT COUNT(p.Name) FROM Product p  ";
 
@@ -336,31 +384,7 @@ namespace WCFServiceWebRole1
             return c;
         }
 
-        public string getProductPrice(string id)
-        {
-            string query = "SELECT p.Price FROM Product p WHERE (p.Bar_code=@Bar_code) ";
-
-            SqlConnection myConnection = GetSqlConnection();
-            SqlCommand myCommand = new SqlCommand(query, myConnection);
-            SqlDataReader myreader;
-            var c = new Object();
-
-            myCommand.Parameters.AddWithValue("@Bar_code", id);
-            try
-            {
-                myCommand.ExecuteNonQuery();
-                myreader = myCommand.ExecuteReader();
-                myreader.Read();
-                c = myreader[0];
-            }
-            catch (Exception e)
-            {
-                return null;
-            }
-            myConnection.Close();
-
-            return c.ToString();
-        }
+        
 
         public bool BuyProduct(string key, string amount)
         {
