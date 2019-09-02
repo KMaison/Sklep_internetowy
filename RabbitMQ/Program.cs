@@ -19,7 +19,12 @@ namespace RabbitMQ
                   exclusive: false, autoDelete: false, arguments: null);
                 channel.BasicQos(0, 1, false);
                 var consumer = new EventingBasicConsumer(channel);
-                channel.BasicConsume(queue: "rpc_queue",
+                channel.BasicConsume(queue: "reservation_queue",
+                  autoAck: false, consumer: consumer);
+                channel.QueueDeclare(queue: "buying_queue", durable: false,
+                  exclusive: false, autoDelete: false, arguments: null);
+                channel.BasicQos(0, 1, false);
+                channel.BasicConsume(queue: "buying_queue",
                   autoAck: false, consumer: consumer);
                 Console.WriteLine(" [x] Awaiting RPC requests");
 
@@ -31,32 +36,61 @@ namespace RabbitMQ
                     var props = ea.BasicProperties;
                     var replyProps = channel.CreateBasicProperties();
                     replyProps.CorrelationId = props.CorrelationId;
+                    if (ea.RoutingKey == "reservation_queue")
+                    {
+                        try
+                        {
+                            var message = Encoding.UTF8.GetString(body);
+                            var comaIndex = message.IndexOf(",");
+                            var key = message.Substring(0, comaIndex);
+                            var amount = message.Substring(comaIndex + 1);
 
-                    try
-                    {
-                        var message = Encoding.UTF8.GetString(body);
-                        var comaIndex = message.IndexOf(",");
-                        var key = message.Substring(0, comaIndex);
-                        var amount = message.Substring(comaIndex + 1);
-                        
-                        
-                        Console.WriteLine(" [.] reserveProduct({0},{1})", key,amount);
 
-                        response = service.ReserveProduct( key,  amount).ToString();
+                            Console.WriteLine(" [.] reserveProduct({0},{1})", key, amount);
+
+                            response = service.ReserveProduct(key, amount).ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(" [.] " + e.Message);
+                            response = "";
+                        }
+                        finally
+                        {
+                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                              basicProperties: replyProps, body: responseBytes);
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                              multiple: false);
+                        }
                     }
-                    catch (Exception e)
+                    else if(ea.RoutingKey == "buying_queue")
                     {
-                        Console.WriteLine(" [.] " + e.Message);
-                        response = "";
+                        try
+                        {
+                            var message = Encoding.UTF8.GetString(body);
+
+
+                            Console.WriteLine(" [.] reserveProduct({0})",message);
+
+                            response = service.CreateClientOrder(message).ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(" [.] " + e.Message);
+                            response = "";
+                        }
+                        finally
+                        {
+                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                              basicProperties: replyProps, body: responseBytes);
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                              multiple: false);
+                        }
                     }
-                    finally
-                    {
-                        var responseBytes = Encoding.UTF8.GetBytes(response);
-                        channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                          basicProperties: replyProps, body: responseBytes);
-                        channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                          multiple: false);
-                    }
+
+
                 };
 
                 Console.WriteLine(" Press [enter] to exit.");
