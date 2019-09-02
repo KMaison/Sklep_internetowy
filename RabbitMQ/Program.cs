@@ -15,7 +15,7 @@ namespace RabbitMQ
             using (var connection = factory.CreateConnection())
             using (var channel = connection.CreateModel())
             {
-                channel.QueueDeclare(queue: "rpc_queue", durable: false,
+                channel.QueueDeclare(queue: "reservation_queue", durable: false,
                   exclusive: false, autoDelete: false, arguments: null);
                 channel.BasicQos(0, 1, false);
                 var consumer = new EventingBasicConsumer(channel);
@@ -35,9 +35,14 @@ namespace RabbitMQ
                     try
                     {
                         var message = Encoding.UTF8.GetString(body);
-                        int n = int.Parse(message);
-                        Console.WriteLine(" [.] getProductPrice({0})", message);
-                        response = service.getProductPrice("3");
+                        var comaIndex = message.IndexOf(",");
+                        var key = message.Substring(0, comaIndex);
+                        var amount = message.Substring(comaIndex + 1);
+                        
+                        
+                        Console.WriteLine(" [.] reserveProduct({0},{1})", key,amount);
+
+                        response = service.ReserveProduct( key,  amount).ToString();
                     }
                     catch (Exception e)
                     {
@@ -57,15 +62,6 @@ namespace RabbitMQ
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
-        }
-        private static int fib(int n)
-        {
-            if (n == 0 || n == 1)
-            {
-                return n;
-            }
-
-            return fib(n - 1) + fib(n - 2);
         }
 
     }
