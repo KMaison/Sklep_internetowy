@@ -70,10 +70,38 @@ namespace RabbitMQ
                         {
                             var message = Encoding.UTF8.GetString(body);
 
+                            var index = message.IndexOf("?");
+                            var functionName = message.Substring(0, index);
+                            message = message.Substring(index+1);
 
-                            Console.WriteLine(" [.] reserveProduct({0})",message);
+                            if (functionName == "ClientOrder")
+                            {
+                                Console.WriteLine(" [.] add client order({0})", message);
+                                response = service.CreateClientOrder(message).ToString();
+                            }
+                            else if (functionName == "Client")
+                            {
+                                Console.WriteLine(" [.] add client ({0})", message);
+                                index = message.IndexOf(",");
+                                var name = message.Substring(0, index);
+                                message = message.Substring(index+1);
+                                index = message.IndexOf(",");
+                                var surname = message.Substring(0, index);
+                                var order_id = message.Substring(index+1);
+                                response = service.AddClient(name,surname,order_id).ToString();
+                            }
+                            else if (functionName == "OrderProduct")
+                            {
+                                Console.WriteLine(" [.] add order product ({0})", message);
+                                index = message.IndexOf(",");
+                                var amount = message.Substring(0, index);
+                                message = message.Substring(index + 1);
+                                index = message.IndexOf(",");
+                                var bar_code = message.Substring(0, index);
+                                var id_client_order = message.Substring(index + 1);
+                                response = service.AddOrderProduct(amount,  bar_code,  id_client_order).ToString();
+                            }
 
-                            response = service.CreateClientOrder(message).ToString();
                         }
                         catch (Exception e)
                         {
