@@ -72,7 +72,57 @@ namespace Rabbit
                               multiple: false);
                         }
                     }
-                   
+                    else if (functionName.Equals("ClientOrder"))
+                    {
+                        try
+                        {
+                            Console.WriteLine(" [.] add client order ({0})", message);
+                            response = service.CreateClientOrder(message).ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(" [.] " + e.Message);
+                            response = "";
+                        }
+                        finally
+                        {
+                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                              basicProperties: replyProps, body: responseBytes);
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                              multiple: false);
+                        }
+                    }
+                    else if (functionName.Equals("ProductOrder"))
+                    {
+                        try
+                        {
+                            //(order.Amount, order.Bar_code, order.ID_client_order
+                            var comaIndex = message.IndexOf(",");
+                            var amount = message.Substring(0, comaIndex);
+                            message = message.Substring(comaIndex + 1);
+                            comaIndex = message.IndexOf(",");
+                            var barcode = message.Substring(0, comaIndex);
+                           var idorder = message.Substring(comaIndex + 1);
+
+                            Console.WriteLine(" [.] add product order ({0})", message);
+                            response = service.AddOrderProduct(amount,barcode,idorder).ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(" [.] " + e.Message);
+                            response = "";
+                        }
+                        finally
+                        {
+                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                              basicProperties: replyProps, body: responseBytes);
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                              multiple: false);
+                        }
+                    }
+
                 };
 
                 Console.WriteLine(" Press [enter] to exit.");
