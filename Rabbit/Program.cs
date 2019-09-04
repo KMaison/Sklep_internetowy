@@ -122,6 +122,35 @@ namespace Rabbit
                               multiple: false);
                         }
                     }
+                    else if (functionName.Equals("Client"))
+                    {
+                        try
+                        {
+                            //client.Firstname, client.Surname, client.Order_ID
+                            var comaIndex = message.IndexOf(",");
+                            var name = message.Substring(0, comaIndex);
+                            message = message.Substring(comaIndex + 1);
+                            comaIndex = message.IndexOf(",");
+                            var surname = message.Substring(0, comaIndex);
+                            var idorder = message.Substring(comaIndex + 1);
+
+                            Console.WriteLine(" [.] add client ({0})", message);
+                            response = service.AddClient(name, surname, idorder).ToString();
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(" [.] " + e.Message);
+                            response = "";
+                        }
+                        finally
+                        {
+                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                              basicProperties: replyProps, body: responseBytes);
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                              multiple: false);
+                        }
+                    }
 
                 };
 
