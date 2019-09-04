@@ -10,6 +10,71 @@ namespace Rabbit
 {
     class Program
     {
+        private static bool CallBuyingQueue(string message, IModel channel)
+        {
+            try
+            {
+                var service = new Service1();
+                var index = message.IndexOf(";");
+                var query1 = message.Substring(0, index);
+                message = message.Substring(index + 1);
+                ////query1
+                Console.WriteLine(" [.] add client order ({0})", query1);             
+                var response1 = service.CreateClientOrder(query1).ToString();
+                Console.WriteLine("ClientOrder: " + response1);
+                ///
+                index = message.IndexOf(";");
+                var query2 = message.Substring(0, index);
+                message = message.Substring(index);
+                //query2
+                var comaIndex = query2.IndexOf(",");
+                var name = query2.Substring(0, comaIndex);
+                query2 = query2.Substring(comaIndex + 1);
+                //comaIndex = query2.IndexOf(",");
+                var surname = query2;
+                var idorder = response1;
+                Console.WriteLine(" [.] add client ({0})", name);
+
+                //kolejka - AddClient (na nowym watku)
+                var response2 = service.AddClient(name, surname, idorder).ToString();
+
+                Console.WriteLine("AddClient: " + response2);
+                //query3
+                index = message.IndexOf(";");
+                message = message.Substring(index + 1);
+                while (!message.Equals(""))
+                {
+
+                    index = message.IndexOf(";");
+                    var query3 = message.Substring(0, index);
+
+                    message = message.Substring(index + 1);
+
+                    comaIndex = query3.IndexOf(",");
+                    var amount = query3.Substring(0, comaIndex);
+                    query3 = query3.Substring(comaIndex + 1);
+                    comaIndex = query3.IndexOf(",");
+                    var barcode = "123457789";// query3;
+                    var idorder1 = response1;
+
+                    Console.WriteLine(" [.] add product order ({0})", barcode);
+                    //kolejka - AddClient (na nowym watku)
+                    var response3 = service.AddOrderProduct(amount, barcode, idorder1);
+                    Console.WriteLine("OrderProduct: " + response3.ToString());
+                    if (!response3)
+                    {
+                        throw new Exception();
+                    }
+                    //TODO: buy product                               
+                }
+            }
+            catch
+            {
+                return false;
+            }
+            return true;
+
+        }
         public static void Main()
         {
             var service = new Service1();
@@ -45,7 +110,7 @@ namespace Rabbit
                     var index = message.IndexOf("?");
                     var functionName = message.Substring(0, index);
                     message = message.Substring(index + 1);
-                    
+
                     if (functionName.Equals("ReserveProduct"))
                     {
                         try
@@ -57,13 +122,13 @@ namespace Rabbit
                             Console.WriteLine(" [.] reserve ({0})", message);
 
                             response = service.ReserveProduct(key, amount).ToString();
-                            
+
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine(" [.] " + e.Message);
                             response = "";
-                            
+
                         }
                         finally
                         {
@@ -74,100 +139,18 @@ namespace Rabbit
                               multiple: false);
                         }
                     }
-                    else if (functionName.Equals("ClientOrder"))
+                    else
                     {
-                        
-                        try
-                        {
-                            Console.WriteLine(" [.] add client order ({0})", message);
-                            response = service.CreateClientOrder(message).ToString();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(" [.] " + e.Message);
-                            response = "";
-
-                            
-                        }
-                        finally
-                        {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
-                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                              basicProperties: replyProps, body: responseBytes);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                              multiple: false);
-                            
-                        }
+                        var t = CallBuyingQueue(message, channel);
                     }
-                    else if (functionName.Equals("ProductOrder"))
-                    {
-                        try
-                        {
-                            //(order.Amount, order.Bar_code, order.ID_client_order
-                            var comaIndex = message.IndexOf(",");
-                            var amount = message.Substring(0, comaIndex);
-                            message = message.Substring(comaIndex + 1);
-                            comaIndex = message.IndexOf(",");
-                            var barcode = message.Substring(0, comaIndex);
-                           var idorder = message.Substring(comaIndex + 1);
-
-                            Console.WriteLine(" [.] add product order ({0})", message);
-                            response = service.AddOrderProduct(amount,barcode,idorder).ToString();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(" [.] " + e.Message);
-                            response = "";
-                            
-                        }
-                        finally
-                        {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
-                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                              basicProperties: replyProps, body: responseBytes);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                              multiple: false);
-                            
-                        }
-                    }
-                    else if (functionName.Equals("Client"))
-                    {
-                        try
-                        {
-                            //client.Firstname, client.Surname, client.Order_ID
-                            var comaIndex = message.IndexOf(",");
-                            var name = message.Substring(0, comaIndex);
-                            message = message.Substring(comaIndex + 1);
-                            comaIndex = message.IndexOf(",");
-                            var surname = message.Substring(0, comaIndex);
-                            var idorder = message.Substring(comaIndex + 1);
-
-                            Console.WriteLine(" [.] add client ({0})", message);
-                            response = service.AddClient(name, surname, idorder).ToString();
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(" [.] " + e.Message);
-                            response = "";
-                        }
-                        finally
-                        {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
-                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                              basicProperties: replyProps, body: responseBytes);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                              multiple: false);
-                        }
-                    }
-
                 };
 
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
         }
-        
-        
+
+
     }
 }
 
