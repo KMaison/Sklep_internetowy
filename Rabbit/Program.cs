@@ -45,6 +45,7 @@ namespace Rabbit
                     var index = message.IndexOf("?");
                     var functionName = message.Substring(0, index);
                     message = message.Substring(index + 1);
+                    
                     if (functionName.Equals("ReserveProduct"))
                     {
                         try
@@ -56,12 +57,13 @@ namespace Rabbit
                             Console.WriteLine(" [.] reserve ({0})", message);
 
                             response = service.ReserveProduct(key, amount).ToString();
-
+                            
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine(" [.] " + e.Message);
                             response = "";
+                            
                         }
                         finally
                         {
@@ -74,6 +76,7 @@ namespace Rabbit
                     }
                     else if (functionName.Equals("ClientOrder"))
                     {
+                        
                         try
                         {
                             Console.WriteLine(" [.] add client order ({0})", message);
@@ -83,6 +86,8 @@ namespace Rabbit
                         {
                             Console.WriteLine(" [.] " + e.Message);
                             response = "";
+
+                            
                         }
                         finally
                         {
@@ -91,6 +96,7 @@ namespace Rabbit
                               basicProperties: replyProps, body: responseBytes);
                             channel.BasicAck(deliveryTag: ea.DeliveryTag,
                               multiple: false);
+                            
                         }
                     }
                     else if (functionName.Equals("ProductOrder"))
@@ -112,6 +118,7 @@ namespace Rabbit
                         {
                             Console.WriteLine(" [.] " + e.Message);
                             response = "";
+                            
                         }
                         finally
                         {
@@ -120,6 +127,7 @@ namespace Rabbit
                               basicProperties: replyProps, body: responseBytes);
                             channel.BasicAck(deliveryTag: ea.DeliveryTag,
                               multiple: false);
+                            
                         }
                     }
                     else if (functionName.Equals("Client"))
