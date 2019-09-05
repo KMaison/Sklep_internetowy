@@ -48,7 +48,7 @@ namespace WCFServiceWebRole1
             SqlConnection myConnection = GetSqlConnection();
             SqlCommand myCommand = new SqlCommand(query, myConnection);
             myCommand.Parameters.AddWithValue("@Amount", amount);
-            myCommand.Parameters.AddWithValue("@Bar_code", bar_code);
+            myCommand.Parameters.AddWithValue("@Bar_code",bar_code);
             myCommand.Parameters.AddWithValue("@ID_client_order", id_client_order);
 
 
@@ -103,6 +103,7 @@ namespace WCFServiceWebRole1
             }
 
             bool x = AddClientOrder(id.ToString(), address, status);
+            if (x == false) return 0;
             return id;
         }
 
