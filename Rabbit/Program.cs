@@ -23,31 +23,29 @@ namespace Rabbit
 
         public void CreateClientOrder(object data)
         {
-            Console.WriteLine(" [.] add client order ({0})", data.ToString());
             order_id =service.CreateClientOrder(data.ToString()).ToString();
-            Console.WriteLine("ClientOrder: " + order_id);
 
         }
         public void AddClient(object data)
         {
             string[] parameters = data.ToString().Split(',');
-
-            Console.WriteLine(" [.] add client ({0})", parameters[0]);
-            
             var response2 = service.AddClient(parameters[0], parameters[1], order_id).ToString();
-
-            Console.WriteLine("AddClient: " + response2);
-
         }
         public void AddOrderProduct(object data)
         {
             if (data.ToString().Equals("")) return;
             string[] parameters = data.ToString().Split(',');
-            Console.WriteLine(" [.] add product order ({0})", parameters[1]);
             var response3 = service.AddOrderProduct(parameters[0], parameters[1], order_id);
-            Console.WriteLine("OrderProduct: " + response3.ToString());
 
 
+        }
+        public void BuyProduct(object data)
+        {
+            if (data.ToString().Equals("")) return;
+            string[] parameters = data.ToString().Split(',');
+            Console.WriteLine(" [.] buy product ({0})", parameters[0]);
+            var response3 = service.BuyProduct(parameters[0], parameters[1]);
+            Console.WriteLine("Buy product: " + response3.ToString());
         }
     }
     class Program
@@ -96,7 +94,16 @@ namespace Rabbit
                         oThread3.Abort();
                     }
                     i++;
-                    //TODO: buy product                               
+                    //buy product   
+                    Thread oThread4 = new Thread(new ParameterizedThreadStart(
+                oMyThreadClass.BuyProduct));
+                    oThread4.Start(queries[i]);
+                    oThread4.Join();
+                    if (oThread4.IsAlive)
+                    {
+                        oThread4.Abort();
+                    }
+                    i++;
                 }
             }
             catch
