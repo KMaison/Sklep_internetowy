@@ -16,3 +16,21 @@ C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\Rabbit\bin\Debug\W
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\Rabbit\bin\Debug\WCFServiceWebRole1.pdb
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\Rabbit\bin\Debug\WCFServiceWebRole1.dll.config
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\Rabbit\obj\Debug\Rabbit.csprojAssemblyReference.cache
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\obj\Debug\Rabbit.csprojAssemblyReference.cache
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\obj\Debug\Rabbit.csproj.CoreCompileInputs.cache
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\obj\Debug\Rabbit.exe
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\obj\Debug\Rabbit.pdb
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\Rabbit.exe.config
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\Rabbit.exe
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\Rabbit.pdb
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\Microsoft.Diagnostics.Tracing.EventSource.dll
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\RabbitMQ.Client.dll
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\WCFServiceWebRole1.dll
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\Microsoft.WindowsAzure.ServiceRuntime.dll
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\WindowsAzureTelemetryEvents.dll
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\WindowsAzureEventSource.dll
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\WCFServiceWebRole1.pdb
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\WCFServiceWebRole1.dll.config
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\Microsoft.Diagnostics.Tracing.EventSource.xml
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\bin\Debug\RabbitMQ.Client.xml
+C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\makuch\Sklep_internetowy\Rabbit\obj\Debug\Rabbit.csproj.CopyComplete

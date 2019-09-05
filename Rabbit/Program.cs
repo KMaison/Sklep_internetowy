@@ -7,7 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using WCFServiceWebRole1;
 using System.Threading;
-using System.Diagnostics;
+using System.Net.Mail;
+using System.Net;
 
 namespace Rabbit
 {
@@ -26,10 +27,11 @@ namespace Rabbit
             order_id =service.CreateClientOrder(data.ToString()).ToString();
 
         }
-        public void AddClient(object data)
+         public bool AddClient(object data)
         {
             string[] parameters = data.ToString().Split(',');
             var response2 = service.AddClient(parameters[0], parameters[1], order_id).ToString();
+            return true;  //todo zmienic na response w formie boola
         }
         public void AddOrderProduct(object data)
         {
@@ -50,6 +52,50 @@ namespace Rabbit
     }
     class Program
     {
+
+         static string Message(string all)
+        {
+            string[] products = all.Split(';');
+            string body = "Hi! Thank you for order in our store! \n Your order includes: \n\n";
+            foreach (var product in products)
+            {
+                string[] thing = product.Split(',');
+                body += thing[0] + " \n";
+                body += "\b\b Amount: " + thing[1];
+                body += " \n ";
+            }
+            body += "\n\n We hope you will be satisfied with our services. \n Greetings, \n Team WebStore";
+            Console.WriteLine(body);
+            return body;
+        }
+        static void Send(string address, string products)
+        {
+            var fromAddress = new MailAddress("chatwithmedev@gmail.com", "From Name");
+            var toAddress = new MailAddress(address.ToString(), "To Name");
+            const string fromPassword = "cwmdev22";
+            const string subject = "Your order from WebStore";
+
+            string body = Message(products);
+
+            var smtp = new SmtpClient
+            {
+                Host = "smtp.gmail.com",
+                Port = 587,
+                EnableSsl = true,
+                DeliveryMethod = SmtpDeliveryMethod.Network,
+                UseDefaultCredentials = false,
+                Credentials = new NetworkCredential(fromAddress.Address, fromPassword)
+            };
+            using (var message = new MailMessage(fromAddress, toAddress)
+            {
+                Subject = subject,
+                Body = body
+            })
+            {
+                smtp.Send(message);
+            }
+        }
+
         private static bool CallBuyingQueue(string message, IModel channel)
         {
             try
@@ -58,11 +104,11 @@ namespace Rabbit
 
                 
                 string[] queries = message.Split(';');
-
-                ///W¹tek 1
+                var mail = queries[0];
+                ///Wï¿½tek 1
                 Thread oThread = new Thread(new ParameterizedThreadStart(
                 oMyThreadClass.CreateClientOrder));
-                oThread.Start(queries[0]);
+                oThread.Start(queries[1]);
                 oThread.Join();
                 if (oThread.IsAlive)
                 {
@@ -70,10 +116,10 @@ namespace Rabbit
                 }
 
                 //kolejka - AddClient (na nowym watku)
-                Thread oThread1 = new Thread(new ParameterizedThreadStart(
-                oMyThreadClass.AddClient));
-                oThread1.Start(queries[1]);
-                Thread.SpinWait(100000);
+                Thread oThread1 = new Thread(() => 
+                { oMyThreadClass.AddClient(queries[2]); }
+                );
+                oThread1.Start();
                 oThread1.Join();
                 if (oThread1.IsAlive)
                 {
@@ -83,7 +129,8 @@ namespace Rabbit
                 //query3
                 //Thread oThread3 = new Thread(new ParameterizedThreadStart(
                 //oMyThreadClass.AddOrderProduct));
-                int i = 2;
+                int i = 3;
+                string products="";
                 while ((i<queries.Length)&&(!queries[i].Equals("")))
                 {
                     Thread oThread3 = new Thread(new ParameterizedThreadStart(
@@ -104,8 +151,10 @@ namespace Rabbit
                     {
                         oThread4.Abort();
                     }
+                    products += queries[i];
                     i++;
                 }
+                 Send(mail, products); //wysli do kolejki chec send_email
             }
             catch
             {
