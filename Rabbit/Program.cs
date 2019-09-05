@@ -73,6 +73,7 @@ namespace Rabbit
                 Thread oThread1 = new Thread(new ParameterizedThreadStart(
                 oMyThreadClass.AddClient));
                 oThread1.Start(queries[1]);
+                Thread.SpinWait(100000);
                 oThread1.Join();
                 if (oThread1.IsAlive)
                 {

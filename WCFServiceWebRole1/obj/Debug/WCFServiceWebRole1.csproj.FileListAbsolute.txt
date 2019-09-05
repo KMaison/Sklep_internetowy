@@ -257,7 +257,6 @@ C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\Sklep_intern
 C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.csproj.CopyComplete
 C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.dll
 C:\Users\Karolina\Desktop\Sklep\Projekt wakacyjny\Sklep_internetowy\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.pdb
-C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.csprojAssemblyReference.cache
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.csproj.CoreCompileInputs.cache
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.dll
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.pdb
