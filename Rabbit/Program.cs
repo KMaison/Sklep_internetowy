@@ -6,65 +6,96 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WCFServiceWebRole1;
+using System.Threading;
+using System.Diagnostics;
+
 namespace Rabbit
 {
+    class OrderThreadClass
+    {
+        protected Service1 service; 
+        protected string order_id;
+
+        public OrderThreadClass()
+        {
+            service = new Service1();
+        }
+
+        public void CreateClientOrder(object data)
+        {
+            Console.WriteLine(" [.] add client order ({0})", data.ToString());
+            order_id =service.CreateClientOrder(data.ToString()).ToString();
+            Console.WriteLine("ClientOrder: " + order_id);
+
+        }
+        public void AddClient(object data)
+        {
+            string[] parameters = data.ToString().Split(',');
+
+            Console.WriteLine(" [.] add client ({0})", parameters[0]);
+            
+            var response2 = service.AddClient(parameters[0], parameters[1], order_id).ToString();
+
+            Console.WriteLine("AddClient: " + response2);
+
+        }
+        public void AddOrderProduct(object data)
+        {
+            if (data.ToString().Equals("")) return;
+            string[] parameters = data.ToString().Split(',');
+            Console.WriteLine(" [.] add product order ({0})", parameters[1]);
+            var response3 = service.AddOrderProduct(parameters[0], parameters[1], order_id);
+            Console.WriteLine("OrderProduct: " + response3.ToString());
+
+
+        }
+    }
     class Program
     {
         private static bool CallBuyingQueue(string message, IModel channel)
         {
             try
             {
-                var service = new Service1();
-                var index = message.IndexOf(";");
-                var query1 = message.Substring(0, index);
-                message = message.Substring(index + 1);
-                ////query1
-                Console.WriteLine(" [.] add client order ({0})", query1);             
-                var response1 = service.CreateClientOrder(query1).ToString();
-                Console.WriteLine("ClientOrder: " + response1);
-                ///
-                index = message.IndexOf(";");
-                var query2 = message.Substring(0, index);
-                message = message.Substring(index);
-                //query2
-                var comaIndex = query2.IndexOf(",");
-                var name = query2.Substring(0, comaIndex);
-                query2 = query2.Substring(comaIndex + 1);
-                //comaIndex = query2.IndexOf(",");
-                var surname = query2;
-                var idorder = response1;
-                Console.WriteLine(" [.] add client ({0})", name);
+                OrderThreadClass oMyThreadClass = new OrderThreadClass();
+
+                
+                string[] queries = message.Split(';');
+
+                ///W¹tek 1
+                Thread oThread = new Thread(new ParameterizedThreadStart(
+                oMyThreadClass.CreateClientOrder));
+                oThread.Start(queries[0]);
+                oThread.Join();
+                if (oThread.IsAlive)
+                {
+                    oThread.Abort();
+                }
 
                 //kolejka - AddClient (na nowym watku)
-                var response2 = service.AddClient(name, surname, idorder).ToString();
-
-                Console.WriteLine("AddClient: " + response2);
-                //query3
-                index = message.IndexOf(";");
-                message = message.Substring(index + 1);
-                while (!message.Equals(""))
+                Thread oThread1 = new Thread(new ParameterizedThreadStart(
+                oMyThreadClass.AddClient));
+                oThread1.Start(queries[1]);
+                oThread1.Join();
+                if (oThread1.IsAlive)
                 {
+                    oThread1.Abort();
+                }
 
-                    index = message.IndexOf(";");
-                    var query3 = message.Substring(0, index);
-
-                    message = message.Substring(index + 1);
-
-                    comaIndex = query3.IndexOf(",");
-                    var amount = query3.Substring(0, comaIndex);
-                    query3 = query3.Substring(comaIndex + 1);
-                    comaIndex = query3.IndexOf(",");
-                    var barcode = "123457789";// query3;
-                    var idorder1 = response1;
-
-                    Console.WriteLine(" [.] add product order ({0})", barcode);
-                    //kolejka - AddClient (na nowym watku)
-                    var response3 = service.AddOrderProduct(amount, barcode, idorder1);
-                    Console.WriteLine("OrderProduct: " + response3.ToString());
-                    if (!response3)
+                //query3
+                //Thread oThread3 = new Thread(new ParameterizedThreadStart(
+                //oMyThreadClass.AddOrderProduct));
+                int i = 2;
+                while ((i<queries.Length)&&(!queries[i].Equals("")))
+                {
+                    Thread oThread3 = new Thread(new ParameterizedThreadStart(
+                oMyThreadClass.AddOrderProduct));
+                    oThread3.Start(queries[i]);
+                    oThread3.Join();
+                    if (oThread3.IsAlive)
                     {
-                        throw new Exception();
+                        oThread3.Abort();
                     }
+                    i++;
                     //TODO: buy product                               
                 }
             }
@@ -141,7 +172,26 @@ namespace Rabbit
                     }
                     else
                     {
-                        var t = CallBuyingQueue(message, channel);
+                        try
+                        {
+
+                            response = CallBuyingQueue(message, channel).ToString();
+
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(" [.] " + e.Message);
+                            response = "";
+
+                        }
+                        finally
+                        {
+                            var responseBytes = Encoding.UTF8.GetBytes(response);
+                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                              basicProperties: replyProps, body: responseBytes);
+                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                              multiple: false);
+                        }
                     }
                 };
 
