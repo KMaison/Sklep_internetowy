@@ -9,6 +9,7 @@ using WCFServiceWebRole1;
 using System.Threading;
 using System.Net.Mail;
 using System.Net;
+using System.Collections.Concurrent;
 
 namespace Rabbit
 {
@@ -41,12 +42,11 @@ namespace Rabbit
         }
         public bool AddOrderProduct(object data)
         {
-            //if (data.ToString().Equals("")) return false;
-            //string[] parameters = data.ToString().Split(',');
-            //var response3 = service.AddOrderProduct(parameters[0], parameters[1], order_id);
-            //if (response3.Equals("True")) return true;
-            //else return false;
-            return false;
+            if (data.ToString().Equals("")) return false;
+            string[] parameters = data.ToString().Split(',');
+            var response3 = service.AddOrderProduct(parameters[0], parameters[1], order_id);
+            if (response3 == true) return true;
+            else return false;
 
 
         }
@@ -57,7 +57,7 @@ namespace Rabbit
             Console.WriteLine(" [.] buy product ({0})", parameters[0]);
             var response3 = service.BuyProduct(parameters[0], parameters[1]);
             Console.WriteLine("Buy product: " + response3.ToString());
-            if (response3.Equals("True")) return true;
+            if (response3 ==  true) return true;
             else return false;
         }
     }
@@ -70,6 +70,8 @@ namespace Rabbit
             string body = "Hi! Thank you for order in our store! \n Your order includes: \n\n";
             foreach (var product in products)
             {
+                if (product.Equals(""))
+                    break;
                 string[] thing = product.Split(',');
                 body += thing[0] + " \n";
                 body += "\b\b Amount: " + thing[1];
@@ -79,8 +81,17 @@ namespace Rabbit
             Console.WriteLine(body);
             return body;
         }
-        static void Send(string address, string products)
+        static void Send(string param)
         {
+            string[] queries = param.Split(';');
+            string address = queries[0];
+            int i = 3;
+            string products = "";
+            while ((i < queries.Length) && (!queries[i].Equals("")))
+            {   i++;
+                products += queries[i]+';';
+                i++;
+            }
             var fromAddress = new MailAddress("chatwithmedev@gmail.com", "From Name");
             var toAddress = new MailAddress(address.ToString(), "To Name");
             const string fromPassword = "cwmdev22";
@@ -126,6 +137,7 @@ namespace Rabbit
                 
                 oThread.Start();
                 oThread.Join();
+
                 if (response1 == false) return false;
                 if (oThread.IsAlive)
                 {
@@ -135,7 +147,7 @@ namespace Rabbit
                 //kolejka - AddClient (na nowym watku)
                 bool response2 = false;
                 Thread oThread1 = new Thread(() =>
-                { response2 = oMyThreadClass.CreateClientOrder(a); });
+                { response2 = oMyThreadClass.AddClient(queries[2]); });
 
                 oThread1.Start();
                 oThread1.Join();
@@ -153,7 +165,7 @@ namespace Rabbit
                 {
                     bool response3 = false;
                     Thread oThread3 = new Thread(() =>
-                    { response3 = oMyThreadClass.CreateClientOrder(a); });
+                    { response3 = oMyThreadClass.AddOrderProduct(queries[i]); });
                     oThread3.Start();
                     oThread3.Join();
                     if (response3 == false)
@@ -166,7 +178,7 @@ namespace Rabbit
                     //buy product   
                     bool response4 = false;
                     Thread oThread4 = new Thread(() => 
-                    { response4 = oMyThreadClass.CreateClientOrder(a); });
+                    { response4 = oMyThreadClass.BuyProduct(queries[i]); });
                     oThread4.Start();
                     oThread4.Join();
                     if (response4 == false) return false;
@@ -177,7 +189,7 @@ namespace Rabbit
                     products += queries[i];
                     i++;
                 }
-                 Send(mail, products); //wysli do kolejki chec send_email
+                 Send(message); 
             }
             catch
             {
@@ -185,6 +197,23 @@ namespace Rabbit
             }
             return true;
 
+        }
+        private static string Call(string message, IModel channel,IBasicProperties props,EventingBasicConsumer consumer,string replyQueueName,
+            BlockingCollection<string> respQueue)
+        {
+            var messageBytes = Encoding.UTF8.GetBytes(message);
+            channel.BasicPublish(
+                exchange: "",
+                routingKey: "sending_queue",
+                basicProperties: props,
+                body: messageBytes);
+
+            channel.BasicConsume(
+                consumer: consumer,
+                queue: replyQueueName,
+                autoAck: true);
+
+            return respQueue.Take();
         }
         public static void Main()
         {
@@ -198,6 +227,11 @@ namespace Rabbit
                 channel.QueueDeclare(queue: "buying_queue", durable: false,
                  exclusive: false, autoDelete: false, arguments: null);
 
+
+                
+                var replyQueueSend= channel.QueueDeclare(queue: "sending_queue", durable: false,
+                 exclusive: false, autoDelete: false, arguments: null);
+
                 channel.BasicQos(0, 1, false);
                 var consumer = new EventingBasicConsumer(channel);
 
@@ -206,75 +240,88 @@ namespace Rabbit
                 channel.BasicConsume(queue: "buying_queue",
                   autoAck: false, consumer: consumer);
 
+                channel.BasicConsume(queue: "sending_queue",
+                  autoAck: false, consumer: consumer);
+
                 Console.WriteLine(" [x] Awaiting RPC requests");
-
-                consumer.Received += (model, ea) =>
-                {
-                    string response = null;
-
-                    var body = ea.Body;
-                    var props = ea.BasicProperties;
-                    var replyProps = channel.CreateBasicProperties();
-                    replyProps.CorrelationId = props.CorrelationId;
-                    //
-                    var message = Encoding.UTF8.GetString(body);
-                    var index = message.IndexOf("?");
-                    var functionName = message.Substring(0, index);
-                    message = message.Substring(index + 1);
-
-                    if (functionName.Equals("ReserveProduct"))
+               // while () {
+                    consumer.Received += (model, ea) =>
                     {
-                        try
-                        {
-                            var comaIndex = message.IndexOf(",");
-                            var key = message.Substring(0, comaIndex);
-                            var amount = message.Substring(comaIndex + 1);
+                        string response = null;
 
-                            Console.WriteLine(" [.] reserve ({0})", message);
+                        var body = ea.Body;
+                        var props = ea.BasicProperties;
+                        var replyProps = channel.CreateBasicProperties();
+                        replyProps.CorrelationId = props.CorrelationId;
+                        //
+                        
+                            var message = Encoding.UTF8.GetString(body);
+                            var index = message.IndexOf("?");
+                            string functionName;
+                            if (index == -1)
+                                functionName = "";
+                            else functionName = message.Substring(0, index);
+                            message = message.Substring(index + 1);
 
-                            response = service.ReserveProduct(key, amount).ToString();
+                            if (functionName.Equals("ReserveProduct"))
+                            {
+                                try
+                                {
+                                    var comaIndex = message.IndexOf(",");
+                                    var key = message.Substring(0, comaIndex);
+                                    var amount = message.Substring(comaIndex + 1);
 
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(" [.] " + e.Message);
-                            response = "";
+                                    Console.WriteLine(" [.] reserve ({0})", message);
 
-                        }
-                        finally
-                        {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
-                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                              basicProperties: replyProps, body: responseBytes);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                              multiple: false);
-                        }
-                    }
-                    else
-                    {
-                        try
-                        {
+                                    response = service.ReserveProduct(key, amount).ToString();
 
-                            response = CallBuyingQueue(message, channel).ToString();
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(" [.] " + e.Message);
+                                    response = "";
 
-                        }
-                        catch (Exception e)
-                        {
-                            Console.WriteLine(" [.] " + e.Message);
-                            response = "";
+                                }
+                                finally
+                                {
+                                    var responseBytes = Encoding.UTF8.GetBytes(response);
+                                    channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                                      basicProperties: replyProps, body: responseBytes);
+                                    channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                                      multiple: false);
+                                }
+                            }
+                            else if (functionName.Equals("Buy"))
+                            {
+                                try
+                                {
 
-                        }
-                        finally
-                        {
-                            var responseBytes = Encoding.UTF8.GetBytes(response);
-                            channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
-                              basicProperties: replyProps, body: responseBytes);
-                            channel.BasicAck(deliveryTag: ea.DeliveryTag,
-                              multiple: false);
-                        }
-                    }
-                };
+                                    response = CallBuyingQueue(message, channel).ToString();
 
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(" [.] " + e.Message);
+                                    response = "";
+
+                                }
+                                finally
+                                {
+                                    var responseBytes = Encoding.UTF8.GetBytes(response);
+                                    channel.BasicPublish(exchange: "", routingKey: props.ReplyTo,
+                                      basicProperties: replyProps, body: responseBytes);
+                                    channel.BasicAck(deliveryTag: ea.DeliveryTag,
+                                      multiple: false);
+                                }
+
+                               
+                            }
+                      
+
+
+
+                    };
+                //}
                 Console.WriteLine(" Press [enter] to exit.");
                 Console.ReadLine();
             }
