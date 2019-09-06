@@ -10,7 +10,8 @@
 );
 CREATE TABLE Client_order(
 	ID_client_order INT PRIMARY KEY,
-	Adress VARCHAR (200) NOT NULL,
+	Adress VARCHAR (200) NOT NULL,	
+	E_mail VARCHAR (200) NOT NULL,
     Order_status VARCHAR (200) CHECK (Order_status IN ('Complete', 'Processing', 'Canceled'))
 );
 CREATE TABLE Order_products(

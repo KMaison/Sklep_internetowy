@@ -325,3 +325,4 @@ C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\bin\RabbitMQ.Client.dll
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\bin\Microsoft.Diagnostics.Tracing.EventSource.xml
 C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\bin\RabbitMQ.Client.xml
+C:\Users\karol\OneDrive\Pulpit\KSR-projekty\Sklep_internetowy\WCFServiceWebRole1\obj\Debug\WCFServiceWebRole1.csprojAssemblyReference.cache

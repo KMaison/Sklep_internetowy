@@ -22,32 +22,43 @@ namespace Rabbit
             service = new Service1();
         }
 
-        public void CreateClientOrder(object data)
+        public bool CreateClientOrder(object data)
         {
-            order_id =service.CreateClientOrder(data.ToString()).ToString();
+            if (data.ToString().Equals("")) return false;
+            string[] parameters = data.ToString().Split(',');
+            order_id = service.CreateClientOrder(parameters[0], parameters[1]).ToString();
+            if (Int32.Parse(order_id) != 0) return true;
+            else return false;
 
         }
          public bool AddClient(object data)
         {
+            if (data.ToString().Equals("")) return false;
             string[] parameters = data.ToString().Split(',');
             var response2 = service.AddClient(parameters[0], parameters[1], order_id).ToString();
-            return true;  //todo zmienic na response w formie boola
+            if (response2.Equals("True")) return true;
+            else return false;
         }
-        public void AddOrderProduct(object data)
+        public bool AddOrderProduct(object data)
         {
-            if (data.ToString().Equals("")) return;
-            string[] parameters = data.ToString().Split(',');
-            var response3 = service.AddOrderProduct(parameters[0], parameters[1], order_id);
+            //if (data.ToString().Equals("")) return false;
+            //string[] parameters = data.ToString().Split(',');
+            //var response3 = service.AddOrderProduct(parameters[0], parameters[1], order_id);
+            //if (response3.Equals("True")) return true;
+            //else return false;
+            return false;
 
 
         }
-        public void BuyProduct(object data)
+        public bool BuyProduct(object data)
         {
-            if (data.ToString().Equals("")) return;
+            if (data.ToString().Equals("")) return false;
             string[] parameters = data.ToString().Split(',');
             Console.WriteLine(" [.] buy product ({0})", parameters[0]);
             var response3 = service.BuyProduct(parameters[0], parameters[1]);
             Console.WriteLine("Buy product: " + response3.ToString());
+            if (response3.Equals("True")) return true;
+            else return false;
         }
     }
     class Program
@@ -106,47 +117,59 @@ namespace Rabbit
                 string[] queries = message.Split(';');
                 var mail = queries[0];
                 ///W�tek 1
-                Thread oThread = new Thread(new ParameterizedThreadStart(
-                oMyThreadClass.CreateClientOrder));
-                oThread.Start(queries[1]);
+                string a = queries[1] + "," + queries[0];
+
+                bool response1 = false;
+                Thread oThread = new Thread(delegate() 
+                {  response1 = oMyThreadClass.CreateClientOrder(a); });
+                   // if (response == false) if_break=true;
+                
+                oThread.Start();
                 oThread.Join();
+                if (response1 == false) return false;
                 if (oThread.IsAlive)
                 {
                     oThread.Abort();
                 }
 
                 //kolejka - AddClient (na nowym watku)
-                Thread oThread1 = new Thread(() => 
-                { oMyThreadClass.AddClient(queries[2]); }
-                );
+                bool response2 = false;
+                Thread oThread1 = new Thread(() =>
+                { response2 = oMyThreadClass.CreateClientOrder(a); });
+
                 oThread1.Start();
                 oThread1.Join();
+                if (response2 == false) return false;
                 if (oThread1.IsAlive)
                 {
                     oThread1.Abort();
                 }
-
                 //query3
                 //Thread oThread3 = new Thread(new ParameterizedThreadStart(
                 //oMyThreadClass.AddOrderProduct));
                 int i = 3;
                 string products="";
-                while ((i<queries.Length)&&(!queries[i].Equals("")))
+                while ((i < queries.Length) && (!queries[i].Equals("")))
                 {
-                    Thread oThread3 = new Thread(new ParameterizedThreadStart(
-                oMyThreadClass.AddOrderProduct));
-                    oThread3.Start(queries[i]);
+                    bool response3 = false;
+                    Thread oThread3 = new Thread(() =>
+                    { response3 = oMyThreadClass.CreateClientOrder(a); });
+                    oThread3.Start();
                     oThread3.Join();
+                    if (response3 == false)
+                        return false;
                     if (oThread3.IsAlive)
                     {
                         oThread3.Abort();
                     }
                     i++;
                     //buy product   
-                    Thread oThread4 = new Thread(new ParameterizedThreadStart(
-                oMyThreadClass.BuyProduct));
-                    oThread4.Start(queries[i]);
+                    bool response4 = false;
+                    Thread oThread4 = new Thread(() => 
+                    { response4 = oMyThreadClass.CreateClientOrder(a); });
+                    oThread4.Start();
                     oThread4.Join();
+                    if (response4 == false) return false;
                     if (oThread4.IsAlive)
                     {
                         oThread4.Abort();

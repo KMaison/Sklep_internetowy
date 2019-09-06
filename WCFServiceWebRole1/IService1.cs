@@ -20,10 +20,10 @@ namespace WCFServiceWebRole1
         bool AddClient(string first_name, string surname, string order_id);
 
         [OperationContract]
-        int CreateClientOrder(string address);
+        int CreateClientOrder(string address,string mail);
 
         [OperationContract]
-        bool AddClientOrder(string orderid, string address, string order_status);
+        bool AddClientOrder(string orderid, string address, string order_status,string mail);
 
         [OperationContract]
         bool BuyProduct(string key, string amount);

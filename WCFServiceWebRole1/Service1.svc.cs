@@ -72,7 +72,7 @@ namespace WCFServiceWebRole1
             return RunQuery(myConnection, myCommand);
         }
 
-        public int CreateClientOrder(string address)
+        public int CreateClientOrder(string address,string email)
         {
 
             string status = "Processing";
@@ -102,16 +102,16 @@ namespace WCFServiceWebRole1
                 myConnection.Close();
             }
 
-            bool x = AddClientOrder(id.ToString(), address, status);
+            bool x = AddClientOrder(id.ToString(), address, status,email);
             if (x == false) return 0;
             return id;
         }
 
-        public bool AddClientOrder(string orderid, string address, string order_status)
+        public bool AddClientOrder(string orderid, string address, string order_status,string email)
         {
             string query = "INSERT INTO Client_order " +
-                "(ID_client_order,Adress, Order_status)";
-            query += " VALUES ( @ID_client_order,@Adress, @Order_status)";
+                "(ID_client_order,Adress,E_mail, Order_status)";
+            query += " VALUES ( @ID_client_order,@Adress,@E_mail, @Order_status)";
 
             SqlConnection myConnection = GetSqlConnection();
 
@@ -119,6 +119,7 @@ namespace WCFServiceWebRole1
             myCommand.Parameters.AddWithValue("@ID_client_order", orderid);
             myCommand.Parameters.AddWithValue("@Adress", address);
             myCommand.Parameters.AddWithValue("@Order_status", order_status);
+            myCommand.Parameters.AddWithValue("@E_mail",email);
 
             return RunQuery(myConnection, myCommand);
         }
